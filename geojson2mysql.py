@@ -19,6 +19,9 @@ def GetOptionalValue(tags, key):
 	else:
 		return ""
 
+def Escape(text):
+	return text.replace("'",'\\\'')
+
 GroupMap = {
 	25: "Izvir",
 	26: "Vodnjak",
@@ -132,10 +135,9 @@ def InsertFeature(feat):
 	groupMap = GetGroupMap(tags)
 	extras = GetExtraFields(tags)
 
-	# TODO: kaj pa embedded delimiterji v desc, extras? '"... ročno esc? SQL Quote()?
 	insert = '''
 INSERT INTO `wp_map_locations` (`location_title`,`location_address`,`location_animation`,`location_latitude`,`location_longitude`,`location_city`,`location_state`,`location_zoom`,`location_author`,`location_messages`,`location_settings`,`location_group_map`,`location_extrafields`)
-VALUES ("{}","{}","BOUNCE","{}","{}","{}","{}","0","5",'{}','{}','{}','{}');'''.format(name, address, lat, lon, kraj, obcina, desc, settings, groupMap, extras)
+VALUES ("{}","{}","BOUNCE","{}","{}","{}","{}","0","5",'{}','{}','{}','{}');'''.format(Escape(name), Escape(address), lat, lon, kraj, obcina, Escape(desc), settings, groupMap, extras)
 
 	print(insert)
 
@@ -237,9 +239,8 @@ def UpdateFeature(feat):
 		print("Changing " + feat["id"])
 	print(liveFeat, feat)
 
-	# TODO: kaj pa embedded delimiterji v desc, extras? '"... ročno esc? SQL Quote()?
 	update = '''
-UPDATE `wp_map_locations` SET `location_title`='{}', `location_address`='{}', `location_latitude`='{}', `location_longitude`='{}', `location_messages`='{}', `location_settings`='{}', `location_group_map`='{}', `location_extrafields`='{}' WHERE `location_id` = {};\n'''.format(name, address, lat, lon, desc, settings, groupMap, extras, liveFeat["ID"])
+UPDATE `wp_map_locations` SET `location_title`='{}', `location_address`='{}', `location_latitude`='{}', `location_longitude`='{}', `location_messages`='{}', `location_settings`='{}', `location_group_map`='{}', `location_extrafields`='{}' WHERE `location_id` = {};\n'''.format(Escape(name), Escape(address), lat, lon, Escape(desc), settings, groupMap, extras, liveFeat["ID"])
 
 	print(update)
 
