@@ -1,18 +1,17 @@
 #!/usr/bin/python
+import csv
 import json
 import sys
 
-if len(sys.argv) < 2:
-	print("no input file passed!")
-	exit(1)
+liveFeatures = []
 
-features = None
-with open(sys.argv[1] , "r" ) as f:
-	features = json.load(f)["features"]
+def PrepUpdate():
+	global liveFeatures
 
-if not features:
-	print("bad input file, expecting a geojson!")
-	exit(2)
+	with open(sys.argv[2], newline='') as csvFile:
+		reader = csv.DictReader(csvFile)
+		for row in reader:
+			liveFeatures.append(row)
 
 def GetOptionalValue(tags, key):
 	if key in tags:
@@ -163,6 +162,25 @@ WHERE `map_id` = 7;'''
 	# lenobno predvideva, da id nikoli ne bo šel čez 9999
 
 ###### MAIN
+
+updateMode = False
+if len(sys.argv) < 2:
+	print("no input file passed!")
+	print("USAGE: geojson2mysql.py source.geojson [currentState.csv]")
+	exit(1)
+
+features = None
+with open(sys.argv[1] , "r" ) as f:
+	features = json.load(f)["features"]
+
+if not features:
+	print("bad input file, expecting a geojson!")
+	exit(2)
+
+if len(sys.argv) > 2:
+	print("Starting update mode")
+	updateMode = True
+	PrepUpdate()
 
 for feat in features:
 	InsertFeature(feat)
