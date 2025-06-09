@@ -78,3 +78,12 @@ if [[ -n $timestamp ]]; then
 else
 	echo "pitniki.geojson"
 fi
+
+# TODO: make sure empty timestamps compare falsely
+# TODO: handle disused:amenity
+# TODO: trigger SQL update mode?
+# zaenkrat:
+# - dump mjv prek plugin hacka, da so settings/extras/groupmap odprti
+# - poženi tole za nov geojson (s timestampom zadnje upoštevane posodobitve)
+# - ./geojson2mysql.py workdir/pitniki.posodobljeni.geojson workdir/pitniki-iz-mjv.csv
+# - pri dodajanju pazi, če so kje duplikati z obstoječimi vnosi na mjv, ker je bil pri prvem uvozu upoštevan buffer zone

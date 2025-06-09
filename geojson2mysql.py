@@ -198,7 +198,10 @@ def UpdateFeature(feat):
 		if feat["id"] == live["osm_id"]:
 			liveFeat = live
 	if not liveFeat:
-		print("Node missing on MJV: " + feat["id"]) # TODO: add instead
+		print("Node missing on MJV: " + feat["id"]) # add instead
+		# InsertFeature(feat)
+		return
+	else:
 		return
 
 	tags = feat["properties"]
@@ -226,7 +229,8 @@ def UpdateFeature(feat):
 	changed |= CheckDiff(liveFeat["Longitude"], lon)
 	changed |= CheckDiff(liveFeat["State"], obcina)
 	changed |= CheckDiff(liveFeat["Message"], desc)
-	# changed |= CheckDiff(liveFeat[""], settings) # could be image, but it's partly missing from the mjv dump!? FIXME in preveri pred vsakim uvozom, da ne povoziš
+	# changed |= CheckDiff(liveFeat[""], settings) # could be image, but it's partly missing from the mjv dump (drugi neimenovani col na koncu)!? FIXME in preveri pred vsakim uvozom, da ne povoziš
+	# RAJE ohrani originalno vrednost, če je možno; ker tudi dodatek urlja slike ni dovolj, jo je treba ročno nazaj dodat?
 	changed |= CheckDiff(liveFeat["Categories"], GroupMap[GetGroup(tags)])
 	# changed |= CheckDiff(liveFeat[""], extras) # just obviously timestamp
 
