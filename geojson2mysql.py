@@ -166,6 +166,83 @@ WHERE `map_id` = 7;'''
 	print(grr)
 	# lenobno predvideva, da id nikoli ne bo šel čez 9999
 
+# return true only if the names differ just in the last word, which has to be numeric
+def NameNotNew(old, new):
+	if old == new:
+		return False
+	if old.split()[::-1][0] == new.split()[::-1][0]: # last word
+		# coincidence
+		return False
+	if " ".join(old.split()[::-1][1:]) == " ".join(new.split()[::-1][1:]):
+		# main part is the same, last word is not
+		return True
+	return False
+
+def CheckDiff(old, new):
+	if str(old) == str(new):
+		return False
+	# ehhh
+	if new == "<p> Voda je pitna: Ni podatka — sporočite nam<br>  Opombe: </p>" and old == "<p>   Opombe: </p>":
+		return False
+
+	print("Change detected:")
+	print("- " + str(old) + " |")
+	print("+ " + str(new) + " |")
+	return True
+
+def UpdateFeature(feat):
+	liveFeat = []
+	for live in liveFeatures:
+		if feat["id"] == live["osm_id"]:
+			liveFeat = live
+	if not liveFeat:
+		print("Node missing on MJV: " + feat["id"]) # TODO: add instead
+		return
+
+	tags = feat["properties"]
+
+	name = tags["name"]
+	address = tags["address"] if "address" in feat else ""
+	lat = feat["geometry"]["coordinates"][1]
+	lon = feat["geometry"]["coordinates"][0]
+	obcina = tags["obcina2"]
+	desc = GetDescription(tags, address)
+	settings = GetSettings(tags)
+	groupMap = GetGroupMap(tags)
+	extras = GetExtraFields(tags)
+
+	# revert name change if it was from the anon randomizer, so we avoid diffs like
+	# - Koper / Capodistria 57
+	# + Koper / Capodistria 9
+	if NameNotNew(liveFeat["Title"], name):
+		name = liveFeat["Title"]
+
+	# print a diff, abort if no changes anywhere
+	changed = CheckDiff(liveFeat["Title"], name)
+	changed |= CheckDiff(liveFeat["Address"], address)
+	changed |= CheckDiff(liveFeat["Latitude"], lat)
+	changed |= CheckDiff(liveFeat["Longitude"], lon)
+	changed |= CheckDiff(liveFeat["State"], obcina)
+	changed |= CheckDiff(liveFeat["Message"], desc)
+	# changed |= CheckDiff(liveFeat[""], settings) # could be image, but it's partly missing from the mjv dump!? FIXME in preveri pred vsakim uvozom, da ne povoziš
+	changed |= CheckDiff(liveFeat["Categories"], GroupMap[GetGroup(tags)])
+	# changed |= CheckDiff(liveFeat[""], extras) # just obviously timestamp
+
+	if not changed:
+		print("No change detected, this should not happen!")
+		print("... check for new tags")
+		print(liveFeat, feat)
+		return
+	else:
+		print("Changing " + feat["id"])
+	print(liveFeat, feat)
+
+	# TODO: kaj pa embedded delimiterji v desc, extras? '"... ročno esc? SQL Quote()?
+	update = '''
+UPDATE `wp_map_locations` SET `location_title`='{}', `location_address`='{}', `location_latitude`='{}', `location_longitude`='{}', `location_messages`='{}', `location_settings`='{}', `location_group_map`='{}', `location_extrafields`='{}' WHERE `location_id` = {};\n'''.format(name, address, lat, lon, desc, settings, groupMap, extras, liveFeat["ID"])
+
+	print(update)
+
 ###### MAIN
 
 updateMode = False
@@ -188,7 +265,10 @@ if len(sys.argv) > 2:
 	PrepUpdate()
 
 for feat in features:
-	InsertFeature(feat)
+	if updateMode:
+		UpdateFeature(feat)
+	else:
+		InsertFeature(feat)
 
 # TODO: naši imajo v opisu "Lokacija: ..." - premaknemo pod opombe, ohranimo? Zdaj is osm dodamo naslov, če obstaja
 
