@@ -31,7 +31,7 @@ GroupMap = {
 }
 
 # NOTE: dejansko je lahko v večih skupinah
-def GetGroupMap(tags):
+def GetGroup(tags):
 	group = None
 
 	# vrstni red je pomemben, ker so lahko prisotne vse tri oznake
@@ -66,7 +66,12 @@ def GetGroupMap(tags):
 	if not group:
 		print("SKIPPING incompatibly tagged entry with no group match: ", tags)
 		return ""
+	return group
 
+def GetGroupMap(tags):
+	group = GetGroup(tags)
+	if not group:
+		return "";
 	# meh, format() does not work, since it parses too much
 	# at the same time most of the dump is static, so we still want to just insert
 	return 'a:1:{i:0;s:2:"' + str(group) +'";}'
