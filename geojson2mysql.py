@@ -20,13 +20,22 @@ def GetOptionalValue(tags, key):
 	else:
 		return ""
 
+GroupMap = {
+	25: "Izvir",
+	26: "Vodnjak",
+	23: "Pipa",
+	22: "Fontana",
+	24: "Korito",
+	21: "Pitnik",
+	27: "Za avtodome",
+	20: "Drugi vodni viri"
+}
+
+# NOTE: dejansko je lahko v večih skupinah
 def GetGroupMap(tags):
 	group = None
 
 	# vrstni red je pomemben, ker so lahko prisotne vse tri oznake
-	if GetOptionalValue(tags, "natural") == "spring":
-		group = 25 # Izvir: natural=spring
-
 	if "man_made" in tags:
 		val = tags["man_made"]
 		if val == "water_well":
@@ -40,10 +49,17 @@ def GetGroupMap(tags):
 			group = 22 # Fontana: amenity=fountain
 		elif val == "watering_place":
 			group = 24 # Korito: amenity=watering_place
-		elif val == "drinking_water":
-			group = 21 # Pitnik: amenity=drinking_water
+		# elif val == "drinking_water":
+		# 	group = 21 # Pitnik: amenity=drinking_water
 		elif val == "water_point":
 			group = 27 # Za avtodome: amenity=water_point
+
+	if GetOptionalValue(tags, "natural") == "spring":
+		group = 25 # Izvir: natural=spring
+
+	# kasneje, da imajo ostali prednost
+	if not group and GetOptionalValue(tags, "amenity") == "drinking_water":
+		group = 21 # Pitnik: amenity=drinking_water
 
 	if not group and GetOptionalValue(tags, "drinking_water") == "yes":
 		group = 20 # Drugi vodni viri: drinking_water=yes (kot zadnja, da je catchall)
