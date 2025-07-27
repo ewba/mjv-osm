@@ -244,7 +244,7 @@ def UpdateFeature(feat):
 	print(liveFeat, feat)
 
 	update = '''
-UPDATE `wp_map_locations` SET `location_title`='{}', `location_address`='{}', `location_latitude`='{}', `location_longitude`='{}', `location_messages`='{}', `location_settings`='{}', `location_group_map`='{}', `location_extrafields`='{}' WHERE `location_id` = {};\n'''.format(Escape(name), Escape(address), lat, lon, Escape(desc), settings, groupMap, extras, liveFeat["ID"])
+UPDATE `wp_map_locations` SET `location_title`='{}', `location_state`='{}' `location_address`='{}', `location_latitude`='{}', `location_longitude`='{}', `location_messages`='{}', `location_settings`='{}', `location_group_map`='{}', `location_extrafields`='{}' WHERE `location_id` = {};\n'''.format(Escape(name), obcina, Escape(address), lat, lon, Escape(desc), settings, groupMap, extras, liveFeat["ID"])
 
 	print(update)
 
