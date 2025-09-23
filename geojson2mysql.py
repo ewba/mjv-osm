@@ -146,6 +146,7 @@ VALUES ("{}","{}","BOUNCE","{}","{}","{}","{}","0","5",'{}','{}','{}','{}');'''.
 	# NOTE: the plugin seems to expect a specific order to the structure,
 	#   so currently manual additions fail to register. Sort of a feature.
 	#   Perhaps we should be prepending instead.
+	# NOTE2: doesn't seem to be the case any more!?
 	grr='''
 UPDATE `wp_map_locations`
 SET `location_author` = (SELECT REGEXP_REPLACE(`map_locations`,'^a:([0-9]+):.*$','\\\\1') FROM `wp_create_map` WHERE `map_id`=7)
