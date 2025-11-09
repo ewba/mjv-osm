@@ -199,8 +199,8 @@ def UpdateFeature(feat):
 		if feat["id"] == live["osm_id"]:
 			liveFeat = live
 	if not liveFeat:
-		print("Node missing on MJV: " + feat["id"]) # add instead
-		# InsertFeature(feat)
+		print("-- Node missing on MJV: " + feat["id"]) # add instead
+		InsertFeature(feat)
 		return
 	else:
 		return

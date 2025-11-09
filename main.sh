@@ -2,7 +2,7 @@
 # developed on jq-1.7
 set -e
 testing=1
-timestamp=${1:-2025-05-22T22:15:18Z}
+timestamp=${1:-2025-11-09T10:45:06Z} # already set to the time of last import, no need to pass it
 
 rawFile="pitniki.raw.json"
 
@@ -80,10 +80,16 @@ else
 fi
 
 # TODO: make sure empty timestamps compare falsely
-# TODO: handle disused:amenity
+# TODO: handle disused:amenity, disused:yes
 # TODO: trigger SQL update mode?
 # zaenkrat:
 # - dump mjv prek plugin hacka, da so settings/extras/groupmap odprti
-# - poženi tole za nov geojson (s timestampom zadnje upoštevane posodobitve)
+# - v excelu odfiltriraj vse kategorije, ki niso za na karto
+# - preveri novosti glede na prejšnjič, npr. diff -u drugi_uvoz/pitniki-iz-mjv.csv workdir/pitniki-iz-mjv.csv
+# - poženi main.sh za nov geojson (s timestampom zadnje upoštevane posodobitve)
 # - ./geojson2mysql.py workdir/pitniki.posodobljeni.geojson workdir/pitniki-iz-mjv.csv
 # - pri dodajanju pazi, če so kje duplikati z obstoječimi vnosi na mjv, ker je bil pri prvem uvozu upoštevan buffer zone
+#   - sed -n 's/^.*missing[^:]*: //p' /tmp/mozilla/inserts-only | tail -n 20 | while read u; do firefox --new-tab https://www.openstreetmap.org/$u; done
+#     - tiste s samo 1 revizijo so skoraj ziher nove, se ne splača gledat
+#     - tiste z večimi: tam pa preveri, koliko je stara prva
+#   - če je duplikat, ga ne uvozi še enkrat, ampak (po)nastavi osm_id in resetiraj koordinate
